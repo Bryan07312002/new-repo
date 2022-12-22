@@ -8,6 +8,16 @@ import type {
   AxiosResponseHeaders,
 } from "axios";
 
+function applyMixins(derivedCtor: any, baseCtors: any[]) {
+  baseCtors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
+      if (name !== "constructor") {
+        derivedCtor.prototype[name] = baseCtor.prototype[name];
+      }
+    });
+  });
+}
+
 class RetrieveResource {
   //TODO: trasformar param em string para dar append em url
   public static async retrieve(
@@ -90,4 +100,7 @@ class RetrieveResourceList {
   }
 }
 
-export { RetrieveResource, RetrieveResourceList };
+class RestrieveAndRetrieveList { }
+applyMixins(RestrieveAndRetrieveList, [RetrieveResourceList, RetrieveResource]);
+
+export { RetrieveResource, RetrieveResourceList, RestrieveAndRetrieveList };

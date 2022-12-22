@@ -1,7 +1,11 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { RetrieveResource } from "@/api/mixins/mixins";
 import HttpError from "@/api/http_errors/http_error";
-import type { AxiosResponse, AxiosRequestConfig, AxiosResponseHeaders } from "axios";
+import type {
+  AxiosResponse,
+  AxiosRequestConfig,
+  AxiosResponseHeaders,
+} from "axios";
 
 interface test_props {
   name: string;
@@ -11,7 +15,7 @@ class test_found extends RetrieveResource {
   public data: Object;
 
   constructor(test_obj: test_props) {
-    super(test_obj);
+    super();
 
     this.data = {
       name: test_obj.name ?? "",
@@ -141,6 +145,4 @@ describe("RetrieveResource", () => {
     expect(obj.left).toBeInstanceOf(HttpError);
     expect(obj.right?.status).toBe(undefined);
   });
-
-
 });
