@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { RetrieveResourceList } from "@/api/mixins/mixins";
+import { PaginateMixin } from "@/api/mixins/mixins";
 import { Paginate } from "@/api/basic_utils";
 import type {
   AxiosResponse,
@@ -11,21 +11,21 @@ interface test_props {
   name: string;
 }
 
-class test_found extends RetrieveResourceList {
-  public data: Object;
+const test_found = PaginateMixin(
+  class {
+    public data: Object;
 
-  constructor(test_obj: test_props) {
-    super();
-
-    this.data = {
-      name: test_obj.name ?? "",
-    };
+    constructor(test_obj: test_props) {
+      this.data = {
+        name: test_obj.name ?? "",
+      };
+    }
   }
-}
+)
 
 test_found.prototype.path = "/test/";
 
-test_found.perform_retrieve = async function(path: string, param?: Object | undefined) {
+test_found.perform_retrieve_paginate = async function(path: string, param?: Object | undefined) {
   const response = {
     data: {
       count: 3,
@@ -43,7 +43,7 @@ test_found.perform_retrieve = async function(path: string, param?: Object | unde
 
 describe("RetrieveResource", () => {
   it("Should return list os test obj", async () => {
-    const expected_response = new Paginate<test_found>(
+    const expected_response = new Paginate<typeof test_found>(
       {
         count: 3,
         previous: "",
@@ -52,7 +52,7 @@ describe("RetrieveResource", () => {
       },
       test_found
     );
-    const obj = await test_found.retrieve_list();
+    const obj = await test_found.retrieve_paginate();
 
     expect(obj.right).toStrictEqual(expected_response);
   });

@@ -1,15 +1,19 @@
+import { cons } from "fp-ts/lib/ReadonlyNonEmptyArray";
+
 class HttpErrorHandler {
   public status: number;
   public data: Object;
   public handlers = {
     "400": function() {
-      console.error(400);
       return;
     },
     "401": function() {
       return;
     },
     "404": function() {
+      return;
+    },
+    "500": function() {
       return;
     },
   };

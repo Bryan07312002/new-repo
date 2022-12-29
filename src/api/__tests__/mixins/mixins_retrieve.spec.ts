@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { RetrieveResource } from "@/api/mixins/mixins";
+import { RetrieveMixin } from "@/api/mixins/mixins";
 import HttpError from "@/api/http_errors/http_error";
 import type {
   AxiosResponse,
@@ -11,17 +11,15 @@ interface test_props {
   name: string;
 }
 
-class test_found extends RetrieveResource {
+const test_found = RetrieveMixin(class {
   public data: Object;
 
   constructor(test_obj: test_props) {
-    super();
-
     this.data = {
       name: test_obj.name ?? "",
     };
   }
-}
+})
 
 test_found.prototype.path = "/test/";
 
@@ -38,17 +36,17 @@ test_found.perform_retrieve = async function(path: string, param?: Object | unde
   return response;
 };
 
-class test_not_found extends RetrieveResource {
-  public data: Object;
+const test_not_found = RetrieveMixin(
+  class {
+    public data: Object;
 
-  constructor(test_obj: Object) {
-    super(test_obj);
-
-    this.data = {
-      name: test_obj.name ?? "",
-    };
+    constructor(test_obj: Object) {
+      this.data = {
+        name: test_obj.name ?? "",
+      };
+    }
   }
-}
+)
 test_not_found.prototype.path = "/test/";
 
 test_not_found.perform_retrieve = async function(path: string, param?: Object | undefined) {
@@ -62,17 +60,17 @@ test_not_found.perform_retrieve = async function(path: string, param?: Object | 
   return response;
 };
 
-class test_error extends RetrieveResource {
-  public data: Object;
+const test_error = RetrieveMixin(
+  class {
+    public data: Object;
 
-  constructor(test_obj: Object) {
-    super(test_obj);
-
-    this.data = {
-      name: test_obj.name ?? "",
-    };
+    constructor(test_obj: Object) {
+      this.data = {
+        name: test_obj.name ?? "",
+      };
+    }
   }
-}
+)
 test_error.prototype.path = "/test/";
 
 test_error.perform_retrieve = async function(path: string, param?: Object | undefined) {
@@ -86,17 +84,17 @@ test_error.perform_retrieve = async function(path: string, param?: Object | unde
   return response;
 };
 
-class test_no_path extends RetrieveResource {
-  public data: Object;
+const test_no_path = RetrieveMixin(
+  class {
+    public data: Object;
 
-  constructor(test_obj: Object) {
-    super(test_obj);
-
-    this.data = {
-      name: test_obj.name ?? "",
-    };
+    constructor(test_obj: Object) {
+      this.data = {
+        name: test_obj.name ?? "",
+      };
+    }
   }
-}
+)
 
 test_no_path.perform_retrieve = async function(path: string, param?: Object | undefined) {
   const response = {
