@@ -38,7 +38,7 @@ class API {
       validateStatus: undefined,
       method: config.method ?? Method.GET,
       data: config.data,
-      headers: { ...config.headers, Authorization: `Bearer ${this.jwt()}` } as AxiosRequestHeaders,
+      headers: { Authorization: `Bearer ${this.jwt()}`, ...config.headers } as AxiosRequestHeaders,
       params: config.params,
     })
   }
