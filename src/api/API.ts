@@ -45,8 +45,6 @@ class API {
 
   public async get(path: string, params?: Object, aditional_headers: Object = {}) {
     const request = this.create_request({
-      method: Method.GET,
-      headers: this.headers,
       params: params,
       headers: aditional_headers,
     });
@@ -60,8 +58,6 @@ class API {
 
   public async post(path: string, data: any, aditional_headers: Object = {}, params?: Object) {
     const request = this.create_request({
-      method: Method.POST,
-      headers: this.headers,
       params: params,
       headers: aditional_headers,
       data: data
@@ -76,7 +72,6 @@ class API {
 
   public async put(path: string, data: any, aditional_headers: Object = {}, params?: Object) {
     const request = this.create_request({
-      headers: this.headers,
       params: params,
       headers: aditional_headers,
       data: data
@@ -91,7 +86,6 @@ class API {
 
   public async delete(path: string, aditional_headers: Object = {}, params?: Object) {
     const request = this.create_request({
-      headers: this.headers,
       params: params,
       headers: aditional_headers,
     });

@@ -41,7 +41,6 @@ class AuthenticationHandler extends API {
       const access = response?.data.access;
       const refresh = response?.data.refresh;
       this.set_tokens(access, refresh);
-      console.log("ok")
 
       // If all ok returns null
       return E.right(null);
@@ -65,8 +64,11 @@ class AuthenticationHandler extends API {
   // Check jwt exp date an returns true
   // if is expired or false if is ok
   public is_token_expired(): Boolean {
+    const storage = new Storage<String>();
     const decoded_token = this.decode_jwt();
+    //console.log(storage.getItem("access"), isJwtExpired(storage.getItem("access")));
     if (decoded_token.exp == undefined || decoded_token.exp == null) return true;
+
     const is_token_expired = decoded_token.exp <= Date.now() / 1000;
     return is_token_expired;
   }

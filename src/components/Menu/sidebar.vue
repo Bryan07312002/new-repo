@@ -10,6 +10,7 @@
     <side-bar-button to="/users" :icon="UserIcon" name="Usuários" :show_name="is_open" />
     <side-bar-button to="/" :icon="HandShakeIcon" name="Padrões de qualidade" :show_name="is_open" />
     <side-bar-button to="/alerts" :icon="HandShakeIcon" name="Alertas" :show_name="is_open" />
+    <side-bar-button to="/annotations" :icon="HandShakeIcon" name="Defeitos" :show_name="is_open" />
   </div>
 </template>
 

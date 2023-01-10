@@ -65,7 +65,7 @@ class Paginate<T> {
         config: {} as AxiosRequestConfig,
       } as AxiosResponse;
 
-      return E.left(new HttpError(reponse));
+      return E.left(new HttpError(response));
     }
     url = this.next || this.previous;
 
@@ -75,16 +75,40 @@ class Paginate<T> {
     return E.right(new Paginate<T>(response.data, this.result_type));
   }
 
+  page_number(): number {
+    // if there isnt next or previou page means that there´s only
+    // one page, so page number is one
+    if (!this.next && !this.previous) return 1;
+
+    if (this.next) {
+      const next_number = Number(this.next.split("=")[1]);
+      return next_number - 1;
+    }
+
+    if (this.previous) {
+      let previous_number = Number(this.previous.split("=")[1]);
+
+      // if previous number is not found but url exist means that previous 
+      // page was one
+      if (!previous_number) previous_number = 1
+
+      return previous_number + 1;
+    }
+
+    return 0;
+  }
+
   async api_fetch(
     type: string,
-    custom_url: string,
-    page_number: number = 1
+    custom_url?: string,
+    page_number?: number
   ): Promise<AxiosResponse> {
     const api = new API();
     if (type === "next") return await api.get(this.next || "");
     if (type === "previous") return await api.get(this.previous || "");
 
-    return await api.get(custom_url, { page: page_number });
+    if (!page_number) page_number = 1;
+    return await api.get(custom_url ?? "", { page: page_number });
   }
 }
 

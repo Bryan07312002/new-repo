@@ -3,6 +3,7 @@ import { CRUD } from "@/api/mixins/mixins";
 export interface UserProps {
   id?: number;
   username?: String;
+  full_name?: String;
 }
 
 class User extends CRUD {
@@ -11,8 +12,8 @@ class User extends CRUD {
   constructor(user: UserProps) {
     super();
     this.data = {
-      id: user.id,
-      username: user.username,
+      id: user.id ?? -1,
+      username: user.username ?? "",
       full_name: user.full_name,
     }
   }

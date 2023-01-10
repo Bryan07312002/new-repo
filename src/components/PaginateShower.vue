@@ -5,8 +5,8 @@
         {{ field }}
       </div>
     </div>
-    <loding-place-holder v-if="is_loading" />
-    <div v-if="instance" class="w-full h-5/6 shadow-lg rounded-lg">
+    <loding-place-holder v-if="is_loading && loading" />
+    <div v-if="instance" class="w-full shadow-lg rounded-lg">
       <div class="w-full flex text-[var(--dark-gray)] border-b-[1px] hover:bg-gray-100 transition hover:shadow-md"
         v-for="resource in instance.results" @click="emit('open-show', resource)">
         <div class="w-1/3 p-2 border-l-[1px] border-r-[1px]">{{ resource.data[fields[0]] }}</div>
@@ -14,18 +14,24 @@
         <div class="w-1/3 p-2 border-l-[1px] border-r-[1px]">{{ resource.data[fields[2]] }}</div>
       </div>
     </div>
+    <div class="flex justify-center items-center w-full p-2">
+      <button-vue class="mx-4" @click="previous()" v-if="instance?.previous">Prev</button-vue>
+      <div v-if="instance" class="text-[var(--dark-gray)] font-bold">{{ instance?.page_number() }}</div>
+      <button-vue class="mx-4" @click="next()" v-if="instance?.next">Next</button-vue>
+    </div>
     <div class="w-full flex justify-end pt-4">
-      <Button @click="emit('open-create')">
+      <button-vue @click="emit('open-create')">
         + Novo {{ model_name }}
-      </Button>
+      </button-vue>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Button from "@/components/Button.vue";
-import LodingPlaceHolder from "@/components/LoadingplaceHolder.vue"
+import ButtonVue from "@/components/Button.vue";
+import LodingPlaceHolder from "@/components/LoadingPlaceHolder.vue";
 import { Paginate } from "@/api/basic_utils";
+import { ref } from "vue";
 
 const props = defineProps({
   instance: {
@@ -43,6 +49,25 @@ const props = defineProps({
     default: ""
   }
 })
+const emit = defineEmits(["open-create", "open-show", "change_page"]);
+const loading = ref(false);
 
-const emit = defineEmits(["open-create", "open-show"]);
+const next = async () => {
+  loading.value = true;
+  if (!props.instance) return
+
+  const next_page = await props.instance.next_page();
+  if (next_page?.right !== undefined) return emit("change_page", next_page.right);
+  loading.value = false;
+}
+
+const previous = async () => {
+  loading.value = true;
+  if (!props.instance) return
+
+  const next_page = await props.instance.previous_page();
+  if (next_page?.right !== undefined) return emit("change_page", next_page.right);
+  loading.value = false;
+}
+
 </script>

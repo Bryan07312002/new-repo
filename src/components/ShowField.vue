@@ -1,6 +1,7 @@
 <template>
   <div v-if="show()">
     <p v-if="label" class="text-gray-600 font-semibold">{{ label }}:</p>
+    <div></div>
     <p :class="is_ml()">{{ value }}</p>
   </div>
 </template>

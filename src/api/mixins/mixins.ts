@@ -45,6 +45,43 @@ function RetrieveMixin<TBase extends Constructor>(Base: TBase) {
         };
 }
 
+//TODO: Handle all pagination
+function RetrieveAllMixin<TBase extends Constructor>(Base: TBase) {
+        return class extends Base {
+                public static async retrieve_all(
+                        id: number,
+                        param?: Object
+                ): Promise<E.Either<HttpError, any>> {
+                        let path = this.prototype.path ?? null;
+
+                        if (path === null) {
+                                HttpError.no_path_defined_logger();
+                        }
+
+                        const response = await this.perform_retrieve_all(path, param ?? {});
+
+                        if (response.status === 200) {
+                                // return null if no register where found
+                                if (response.data === null) return E.right(null);
+
+                                const new_resource = new this(response.data);
+                                return E.right(new_resource);
+                        }
+
+                        // if response not correct return obj empty with error
+                        return E.left(new HttpError(response));
+                }
+
+                public static async perform_retrieve_all(
+                        path: string,
+                        param?: Object
+                ): Promise<AxiosResponse> {
+                        const api = new API();
+                        return await api.get(path, param ?? {});
+                }
+        }
+}
+
 function PaginateMixin<TBase extends Constructor>(Base: TBase) {
         return class extends Base {
                 public static async retrieve_paginate(
