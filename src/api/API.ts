@@ -1,29 +1,28 @@
 import axios from "axios";
 import Storage from "@/helpers/storage";
-import * as dotenv from "dotenv";
 
 import type { AxiosResponse, AxiosRequestHeaders } from "axios";
 
-dotenv.config();
+export enum Method {
+  POST = "post",
+  GET = "get",
+  PUT = "put",
+  PATCH = "patch",
+  DELETE = "delete"
+}
+
+export interface request_config {
+  data?: Object;
+  headers?: Object;
+  params?: Object;
+}
 
 class API {
   private jwt: Function; // The JWT token for authentication
   private custom_url: string | undefined;
   public headers: AxiosRequestHeaders | undefined;
 
-  public baseURL = () => this.custom_url ?? process.env.API_URL;
-
-  static build_params(params: Object) {
-    const param_list = Object.keys(params);
-    let string: string = "?";
-    param_list.forEach((el: string, index: number) => {
-      string = string + `${el}=${params[el]}`;
-
-      if (index < param_list.length - 1) string = string + ",";
-    });
-
-    return string;
-  }
+  public baseURL = () => this.custom_url ?? import.meta.env.VITE_API_URL;
 
   constructor(url?: string) {
     // Save the base URL and JWT token provided
@@ -33,98 +32,76 @@ class API {
     this.jwt = () => storage.getItem("access") ?? "";
   }
 
-  public set_headers(headers: AxiosRequestHeaders) {
-    this.headers = {
-      Authorization: `Bearer ${this.jwt()}`,
-      ...headers,
-    };
+  create_request(config: request_config) {
+    return axios.create({
+      baseURL: this.baseURL(),
+      validateStatus: undefined,
+      method: config.method ?? Method.GET,
+      data: config.data,
+      headers: { ...config.headers, Authorization: `Bearer ${this.jwt()}` } as AxiosRequestHeaders,
+      params: config.params,
+    })
   }
 
-  // TODO: Fazer parte de parametros receber um Object e transformar em string
   public async get(path: string, params?: Object, aditional_headers: Object = {}) {
-    // Create the headers object with the Authorization header
-    this.set_headers(aditional_headers as AxiosRequestHeaders);
-    if (params) path = `${path}${API.build_params(params)}`;
+    const request = this.create_request({
+      method: Method.GET,
+      headers: this.headers,
+      params: params,
+      headers: aditional_headers,
+    });
 
-    // Create the full URL by concatenating the base URL and the path
-    const url = `${this.baseURL()}${path}`;
+    // Make api call
+    const response = request.request({ url: path });
 
-    const response = await this.perform_get(url);
     // Return the data from the response
     return response;
   }
 
-  // Actualy perform get request so it´s easier to
-  // polimorfism when makeing tests
-  public async perform_get(url: string): Promise<AxiosResponse> {
-    // instance headers
-    let headers = {};
-    if (this.headers) headers = this.headers;
+  public async post(path: string, data: any, aditional_headers: Object = {}, params?: Object) {
+    const request = this.create_request({
+      method: Method.POST,
+      headers: this.headers,
+      params: params,
+      headers: aditional_headers,
+      data: data
+    });
 
-    return await axios.get(url, headers);
-  }
+    // Make api call
+    const response = request.post(path, data);
 
-  public async post(path: string, body: any, aditional_headers: Object = {}) {
-    // Create the headers object with the Authorization header
-    this.set_headers(aditional_headers as AxiosRequestHeaders);
-
-    const response = await this.perform_post(path, body);
-    // Return the response
-    return response.data;
-  }
-
-  // Actualy perform post request so it´s easier to
-  // polimorfism when makeing tests
-  public async perform_post(path: string, body: any): Promise<AxiosResponse> {
-    // Create the full URL by concatenating the base URL and the path
-    const url = `${this.baseURL()}${path}`;
-    // instance headers
-    let headers = {};
-    if (this.headers) headers = this.headers;
-
-    return await axios.post(url, body, headers);
-  }
-
-  public async put(path: string, body: any, aditional_headers: Object = {}) {
-    // Create the headers object with the Authorization header
-    this.set_headers(aditional_headers as AxiosRequestHeaders);
-
-    const response = await this.perform_put(path, body);
-    // Return the response
+    // Return the data from the response
     return response;
   }
 
-  // Actualy perform PUT request so it´s easier to
-  // polimorfism when makeing tests
-  public async perform_put(path: string, body: any): Promise<AxiosResponse> {
-    // Create the full URL by concatenating the base URL and the path
-    const url = `${this.baseURL()}${path}`;
-    // instance headers
-    let headers = {};
-    if (this.headers) headers = this.headers;
+  public async put(path: string, data: any, aditional_headers: Object = {}, params?: Object) {
+    const request = this.create_request({
+      headers: this.headers,
+      params: params,
+      headers: aditional_headers,
+      data: data
+    });
 
-    return await axios.put(url, body, headers);
-  }
+    // Make api call
+    const response = request.put(path, data);
 
-  public async delete(path: string, aditional_headers: Object = {}) {
-    // Create the full URL by concatenating the base URL and the path
-    this.set_headers(aditional_headers as AxiosRequestHeaders);
-
-    const response = await this.perform_delete(path);
-    // Return the response
+    // Return the data from the response
     return response;
   }
 
-  // Actualy perform DELETE request so it´s easier to
-  // polimorfism when makeing tests
-  public async perform_delete(path: string): Promise<AxiosResponse> {
-    // Create the full URL by concatenating the base URL and the path
-    const url = `${this.baseURL()}${path}`;
-    // instance headers
-    let headers = {};
-    if (this.headers) headers = this.headers;
+  public async delete(path: string, aditional_headers: Object = {}, params?: Object) {
+    const request = this.create_request({
+      headers: this.headers,
+      params: params,
+      headers: aditional_headers,
+    });
 
-    return await axios.delete(url, headers);
+    // Make api call
+    const response = request.delete(path);
+
+    // Return the data from the response
+    return response;
+
   }
 }
 

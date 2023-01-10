@@ -1,7 +1,10 @@
 import API from "./API";
 import Storage from "@/helpers/storage";
 import jwt_decode from "jwt-decode";
+import { isJwtExpired } from 'jwt-check-expiration';
+import * as E from "fp-ts/Either"
 import type { AxiosResponse } from "axios";
+import HttpError from "./http_errors/http_error";
 
 export interface login_form {
   username: string;
@@ -28,20 +31,24 @@ class AuthenticationHandler extends API {
     super(url);
   }
 
-  public async login(form: login_form) {
-    const response = await this.send_login(form);
+  public async login(form: login_form): Promise<E.Either<HttpError, null>> {
+    const response = await this.send_login(form)
+
 
     // Check login status
-    if (response.status == 200) {
+    if (response?.status === 200) {
       // Store tokens at local storage
-      const access = response.data?.access;
-      const refresh = response.data?.refresh;
+      const access = response?.data.access;
+      const refresh = response?.data.refresh;
       this.set_tokens(access, refresh);
+      console.log("ok")
 
-      return response;
+      // If all ok returns null
+      return E.right(null);
     }
 
-    return response;
+    // Return error
+    return E.left(new HttpError(response));
   }
 
   // Send login
@@ -51,7 +58,6 @@ class AuthenticationHandler extends API {
 
   public set_tokens(access?: string, refresh?: string) {
     const storage = new Storage<string>();
-
     if (access) storage.setItem(this.access_token_key, access);
     if (refresh) storage.setItem(this.refresh_token_key, refresh);
   }
@@ -61,7 +67,6 @@ class AuthenticationHandler extends API {
   public is_token_expired(): Boolean {
     const decoded_token = this.decode_jwt();
     if (decoded_token.exp == undefined || decoded_token.exp == null) return true;
-
     const is_token_expired = decoded_token.exp <= Date.now() / 1000;
     return is_token_expired;
   }
@@ -89,7 +94,7 @@ class AuthenticationHandler extends API {
     const storage = new Storage<string>();
     const refresh_token = storage.getItem(this.refresh_token_key) || "";
 
-    const response = await this.send_refresh(refresh_token);
+    const response = await this.send_refresh(refresh_token).catch(err => { return err.response });
 
     // If success save new tokens
     if (response.status === 200) {
@@ -110,7 +115,7 @@ class AuthenticationHandler extends API {
     const refresh_token = storage.getItem(this.refresh_token_key) || "";
     this.purge_auth();
 
-    const response = await this.send_logout(refresh_token);
+    const response = await this.send_logout(refresh_token).catch(err => { return err.response });
 
     return response;
   }

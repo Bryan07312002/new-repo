@@ -1,26 +1,38 @@
 import { createRouter, createWebHistory } from "vue-router";
+import multiguard from 'vue-router-multiguard';
+import authentication_middleware from "../middlewares/authentication.ts"
 
-const HomeView = () => import("@/views/AboutView.vue");
+const HomeView = () => import("@/views/Dashboard/index.vue");
 const LoginView = () => import("@/views/Login/index.vue");
+const UsersView = () => import("@/views/Users/index.vue");
+const AlertView = () => import("@/views/Alerts/index.vue");
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
-      name: "home",
+      name: "Dashboard",
       component: HomeView,
+      beforeEnter: multiguard([authentication_middleware]),
     },
     {
-      path: "/about",
-      name: "about",
-      component: HomeView,
+      path: "/users",
+      name: "Usuários",
+      component: UsersView,
+      beforeEnter: multiguard([authentication_middleware]),
     },
     {
       path: "/login",
-      name: "login",
+      name: "Login",
       component: LoginView,
+    },
+    {
+      path: "/alerts",
+      name: "Alertas",
+      component: AlertView,
     }
+
   ],
 });
 

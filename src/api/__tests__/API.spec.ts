@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
 import API from "@/api/API";
+import { Method } from "@/api/API";
 import Storage from "@/helpers/storage";
 import dotenv from "dotenv";
+import axios from "axios";
 
 import type {
   AxiosResponse,
@@ -12,67 +14,27 @@ import type {
 dotenv.config();
 
 describe("Tests Basic object API wich is a basic HTTP client object", () => {
-  it("Should instantiate", () => {
+  it("Should create correctly the request object", async () => {
+    const api = new API();
     const storage = new Storage<string>();
-    const fake_token = "1234";
-    storage.setItem("access", fake_token);
 
-    console.log(storage.getItem("access") == fake_token);
-    const api = new API();
-    api.set_headers({});
+    storage.setItem("access", "my token")
+    const request_data = {
+      method: Method.POST,
+      data: { hello: "world" },
+      headers: { "Content-Type": "multipart/form-data" },
+      params: { query: "one" },
+    }
 
-    expect(api.headers?.Authorization).toBe(`Bearer ${fake_token}`);
-    expect(api.baseURL()).toBe(process.env.API_URL);
-  });
+    const request = api.create_request(request_data);
 
-  // ------- build_params -------- //
-  it("Should retrive correct query params as string", () => {
-    const params = API.build_params({ page: "1" });
+    expect(request.defaults.data).toStrictEqual(request_data.data);
+    expect(request.defaults.params).toStrictEqual(request_data.params);
+    expect(request.defaults.headers).toContain(request_data.headers);
+    expect(request.defaults.baseURL).toBe(import.meta.env.VITE_API_URL);
 
-    expect(params).toBe("?page=1");
-  });
-
-  it("Should retrive correct query params as string", () => {
-    const params = API.build_params({ page: "1", param: "test" });
-
-    expect(params).toBe("?page=1,param=test");
-  });
-
-  it("Should retrive correct query params as string", () => {
-    const params = API.build_params({
-      page: "1",
-      param: "test",
-      teste: [1, 2, 3],
-    });
-
-    expect(params).toBe("?page=1,param=test,teste=1,2,3");
-  });
-
-  it("Should append good in the url header", async () => {
-    const api = new API();
-    let url: string = "";
-    // Path
-    const path = "";
-    // Mock api call
-    api.perform_get = async (path: string) => {
-      url = path;
-      const response = {
-        data: {
-          name: "test name",
-        },
-        status: 200,
-        statusText: "",
-        headers: {} as AxiosResponseHeaders,
-        config: {} as AxiosRequestConfig,
-      } as AxiosResponse;
-      return response;
-    };
-    await api.get(path, { page: "1", param: "test" });
-
-    //divide between params and url
-    const divide = url.split("?");
-
-    expect(divide[1]).toBe("page=1,param=test");
-    expect(divide[0]).toBe(`${process.env.API_URL}${""}`);
-  });
+    // Should send authorizations token
+    expect(request.defaults.headers).toHaveProperty("Authorization")
+    expect(request.defaults.headers.Authorization).toBe("Bearer " + storage.getItem("access"));
+  })
 });

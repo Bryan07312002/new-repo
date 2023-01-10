@@ -28,7 +28,9 @@ class HttpErrorHandler {
     // Call handler
     const func = this.handlers[this.status];
 
-    func();
+    if (func) {
+      func();
+    }
   }
 }
 

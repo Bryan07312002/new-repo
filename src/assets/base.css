@@ -1,14 +1,31 @@
-/* color palette from <https://github.com/vuejs/theme> */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
 
+:root {
+  /* Base Colors */
+  --light-blue: #0074a3;
+  --blue: #00628a;
+  --dark-blue: #003d56;
+
+  --red: #ff4646;
+  --green: #138500;
+  --light-green: #adff99;
+  --dark-yellow: #6f5400;
+  --yellow: #ffd550;
+
+  --very-light-gray: #ededed;
+  --light-gray: #c4c4c4;
+  --medium-light-gray: #dddddd;
+  --gray: #737373;
+  --dark-gray: #333;
+
+  --font-family: "Roboto", sans-serif;
 }
 
-body {
+* {
   margin: 0px;
   padding: 0px;
+  font-family: var(--font-family);
 }
