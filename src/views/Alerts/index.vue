@@ -7,6 +7,10 @@
 
     <modal @close-modal="state.modal.is_open = false" :is_open="state.modal.is_open">
       <create v-if="state.modal.state === 'create'" />
+
+      <delete-model v-if="state.modal.state === 'delete'" model_name="alerta" field="name" @deleted="handle_deleted()"
+        @cancel="state.modal.is_open == false" />
+
     </modal>
   </default-layout>
 </template>
@@ -16,6 +20,7 @@ import DefaultLayout from "@/layouts/default_layout.vue";
 import PaginateShower from "@/components/PaginateShower.vue"
 import Modal from "@/components/Modal.vue";
 import Create from "./Create.vue";
+import DeleteModel from "@/components/DeleteModel.vue";
 import Alert from "@/api/models/alert";
 import { ref } from "vue";
 
@@ -62,6 +67,7 @@ const handle_open_show = (picked_resource: Alert) => {
 }
 
 const handle_open_delete = () => {
+  console.log('aaaaa')
   state.value.modal.is_open = true;
   state.value.modal.state = ModalStates.Delete;
 }
@@ -69,14 +75,14 @@ const handle_open_delete = () => {
 // actions
 const handle_create = () => {
   // refresh paginated
-  get_paginated_users();
+  get_paginated_alerts();
   state.value.modal.is_open = false;
   state.value.modal.state = ModalStates.None;
 }
 
 const handle_deleted = () => {
   // refresh paginated
-  get_paginated_users();
+  get_paginated_alerts();
   state.value.modal.is_open = false;
   state.value.modal.state = ModalStates.None;
 }
