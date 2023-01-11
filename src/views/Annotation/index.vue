@@ -7,7 +7,11 @@
     </div>
 
     <modal @close-modal="state.modal.is_open = false" :is_open="state.modal.is_open">
-      <show-model-data v-if="state.modal.state === 'show'" :instance="picked" model_name="defeito" />
+      <show-model-data v-if="state.modal.state === 'show'" :instance="picked" model_name="defeito"
+        @open-delete="handle_open_delete()" />
+      <delete-model v-if="state.modal.state === 'delete'" model_name="defeito" field="name" :resource="picked"
+        @deleted="handle_deleted()" @cancel="state.modal.is_open = false" />
+      <create v-if="state.modal.state === 'create'" :model="AnnotationLabel" :fields="[]" />
     </modal>
   </default-layout>
 </template>
@@ -16,9 +20,12 @@
 import DefaultLayout from "@/layouts/default_layout.vue";
 import PaginateShower from "@/components/PaginateShower.vue";
 import Modal from "@/components/Modal.vue";
-import AnnotationLabel from "@/api/models/annotation";
 import ShowModelData from "@/components/ShowModelData.vue";
+import DeleteModel from "@/components/DeleteModel.vue";
+import Create from "./Create.vue";
 import { ref } from "vue";
+
+import AnnotationLabel from "@/api/models/annotation";
 
 enum ModalStates {
   None = "none",
@@ -37,6 +44,13 @@ const state = ref({
     state: ModalStates.None
   }
 })
+
+const editable_fields = [
+  { name: "name", type: String },
+  { name: "probable_cause", type: String },
+  { name: "label", type: String },
+  { name: "process", type: String },
+]
 
 const get_paginated_annotations = async () => {
   // start loading state

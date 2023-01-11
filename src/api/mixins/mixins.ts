@@ -46,10 +46,9 @@ function RetrieveMixin<TBase extends Constructor>(Base: TBase) {
 }
 
 //TODO: Handle all pagination
-function RetrieveAllMixin<TBase extends Constructor>(Base: TBase) {
+function RetrieveListMixin<TBase extends Constructor>(Base: TBase) {
         return class extends Base {
-                public static async retrieve_all(
-                        id: number,
+                public static async retrieve_list(
                         param?: Object
                 ): Promise<E.Either<HttpError, any>> {
                         let path = this.prototype.path ?? null;
@@ -58,26 +57,25 @@ function RetrieveAllMixin<TBase extends Constructor>(Base: TBase) {
                                 HttpError.no_path_defined_logger();
                         }
 
-                        const response = await this.perform_retrieve_all(path, param ?? {});
+                        const response = await this.perform_retrieve_list(path, param ?? {});
 
                         if (response.status === 200) {
                                 // return null if no register where found
                                 if (response.data === null) return E.right(null);
 
-                                const new_resource = new this(response.data);
-                                return E.right(new_resource);
+                                return E.right(response.data);
                         }
 
                         // if response not correct return obj empty with error
                         return E.left(new HttpError(response));
                 }
 
-                public static async perform_retrieve_all(
+                public static async perform_retrieve_list(
                         path: string,
                         param?: Object
                 ): Promise<AxiosResponse> {
                         const api = new API();
-                        return await api.get(path, param ?? {});
+                        return await api.get(path + "list/", param ?? {});
                 }
         }
 }
@@ -234,6 +232,6 @@ function DeleteMixin<TBase extends Constructor>(Base: TBase) {
 };
 
 const RetrievePaginateMixin = PaginateMixin(RetrieveMixin(class { }));
-const CRUD = PaginateMixin(RetrieveMixin(CreateMixin(UpdateMixin(DeleteMixin(class { })))));
+const CRUD = PaginateMixin(RetrieveMixin(CreateMixin(UpdateMixin(DeleteMixin(RetrieveListMixin(class { }))))));
 
 export { RetrieveMixin, PaginateMixin, CreateMixin, UpdateMixin, RetrievePaginateMixin, CRUD };
