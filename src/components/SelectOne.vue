@@ -3,7 +3,7 @@
     <label class="text-gray-600 font-semibold" v-if="label">
       {{ label }}:
     </label>
-    <select @input="emit('input', $event.target?.value)" :value="value"
+    <select @input="input($event)" :value="value"
       class="border-[1px] h-[32px] w-full pl-2 text-gray-700 border-gray-400 rounded-lg bg-white">
       <option v-for="option in  options" :value="option.id" :key="option.id">
         {{ option.name }}
@@ -25,4 +25,5 @@ defineProps({
 })
 
 const emit = defineEmits(["input"]);
+const input = (event: Event) => emit('input', (event.target as HTMLInputElement).value);
 </script>

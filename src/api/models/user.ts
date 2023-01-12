@@ -8,6 +8,7 @@ export interface UserProps {
 
 class User extends CRUD {
   data: Object;
+  old_data: Object
 
   constructor(user: UserProps) {
     super();
@@ -16,6 +17,8 @@ class User extends CRUD {
       username: user.username ?? "",
       full_name: user.full_name,
     }
+
+    this.old_data = { ...this.data }
   }
 }
 

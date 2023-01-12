@@ -14,7 +14,12 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
+export interface ModalState<States> {
+  is_open: boolean;
+  state: States
+}
+
+defineProps({
   is_open: {
     type: Boolean,
     default: true

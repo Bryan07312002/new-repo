@@ -9,8 +9,8 @@
     <side-bar-button to="/" :icon="WheelIcon" name="Modelos de rodas" :show_name="is_open" />
     <side-bar-button to="/users" :icon="UserIcon" name="Usuários" :show_name="is_open" />
     <side-bar-button to="/" :icon="HandShakeIcon" name="Padrões de qualidade" :show_name="is_open" />
-    <side-bar-button to="/alerts" :icon="HandShakeIcon" name="Alertas" :show_name="is_open" />
-    <side-bar-button to="/annotations" :icon="HandShakeIcon" name="Defeitos" :show_name="is_open" />
+    <side-bar-button to="/alerts" :icon="BellIcon" name="Alertas" :show_name="is_open" />
+    <side-bar-button to="/annotations" :icon="DefectIcon" name="Defeitos" :show_name="is_open" />
   </div>
 </template>
 
@@ -21,13 +21,14 @@ import ChartPieIcon from "@/assets/icons/ChartPieIcon.vue";
 import WheelIcon from "@/assets/icons/WheelIcon.vue";
 import UserIcon from "@/assets/icons/UserIcon.vue";
 import HandShakeIcon from "@/assets/icons/HandShakeIcon.vue";
+import BellIcon from "@/assets/icons/BellIcon.vue";
+import DefectIcon from "@/assets/icons/DefectIcon.vue";
 
 import { ref } from "vue";
 
 const is_open = ref(false);
 
 const open = () => {
-  console.log(is_open.value)
   is_open.value = !is_open.value;
 }
 </script>

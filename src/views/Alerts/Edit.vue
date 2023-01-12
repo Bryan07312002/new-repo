@@ -4,11 +4,15 @@
 
     <input-vue class="mt-3" label="Limit" :value="instance.data.limit" @input="instance.data.limit = $event"
       type="number" />
+
     <input-vue class="mt-3" label="Time_interval" :value="instance.data.time_interval"
       @input="instance.data.time_interval = $event" type="number" />
+
     <Checkbox class="mt-3" label="Eneabled" :value="instance.data.enabled" @input="instance.data.enabled = $event" />
+
     <select-one class="mt-3" label="Area" :value="instance.data.area" :options="areas_options"
       @input="instance.data.area = $event" />
+
     <select-one class="mt-3" label="Defeito" :value="instance.data.label" :options="annotation_options"
       @input="instance.data.label = $event" />
 
@@ -34,17 +38,17 @@ import { ref } from "vue";
 import type { Ref } from "vue";
 import type HttpError from "@/api/http_errors/http_error";
 
-defineProps({
+const props = defineProps({
+  instance: { type: Alert, default: new Alert({}) },
   areas_options: { type: Array, default: [] },
-  annotation_options: { type: Array, default: [] }
+  annotation_options: { type: Array, default: [] },
 });
 const emit = defineEmits(["cancel", "created"]);
 
-const instance: Ref<Alert> = ref(new Alert({}));
 const error: Ref<HttpError | undefined> = ref();
 
 const handle_create = async () => {
-  const response = await instance.value.create();
+  const response = await props.instance.update();
 
   if (response._tag == "Right") {
     error.value = undefined;
