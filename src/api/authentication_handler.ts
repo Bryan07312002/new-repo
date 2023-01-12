@@ -1,7 +1,6 @@
 import API from "./API";
 import Storage from "@/helpers/storage";
 import jwt_decode from "jwt-decode";
-import { isJwtExpired } from 'jwt-check-expiration';
 import * as E from "fp-ts/Either"
 import type { AxiosResponse } from "axios";
 import HttpError from "./http_errors/http_error";
@@ -64,12 +63,7 @@ class AuthenticationHandler extends API {
   // Check jwt exp date an returns true
   // if is expired or false if is ok
   public is_token_expired(): Boolean {
-    const storage = new Storage<String>();
     const decoded_token = this.decode_jwt();
-    //console.log(storage.getItem("access"), isJwtExpired(storage.getItem("access")));
-    console.log('now', Date.now()/1000)
-    console.log('exp', decoded_token.exp)
-    console.log(decoded_token.exp <= Date.now() / 1000)
     if (decoded_token.exp == undefined || decoded_token.exp == null) return true;
 
     const is_token_expired = decoded_token.exp <= Date.now() / 1000;
@@ -82,7 +76,6 @@ class AuthenticationHandler extends API {
     const is_token_expired = this.is_token_expired();
     if (!is_token_expired) return true;
 
-    console.log('Try refresh')
     if (try_refresh) {
       const response = await this.refresh();
       if (response.status === 200) {
@@ -104,7 +97,6 @@ class AuthenticationHandler extends API {
 
     // If success save new tokens
     if (response.status === 200) {
-      console.log(response.data)
       this.set_tokens(
         response.data['access'],
         response.data['refresh']
@@ -121,9 +113,7 @@ class AuthenticationHandler extends API {
       data: data
     });
 
-    console.log(request.defaults.headers)
     delete request.defaults.headers.Authorization
-      
 
     // // Make api call
     const response = request.post(path, data);
@@ -162,7 +152,6 @@ class AuthenticationHandler extends API {
       return decoded_token as DecodedToken;
     } catch (error) {
       // TODO: make a log obj to detect and dont log in test mode
-      //console.log(error.message);
     }
     return {} as DecodedToken;
   }

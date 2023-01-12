@@ -7,8 +7,6 @@ const Auth = async function(to, from, next) {
   const auth_handler = new authentication_handler()
   const is_auth = await auth_handler.is_auth(true);
 
-  console.log(is_auth)
-
   if (is_auth) {
     return next();
   }

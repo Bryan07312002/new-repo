@@ -1,18 +1,17 @@
 <template>
-  <div class="p-6 min-w-[40vw]">
+  <div class="p-6 w-screen sm:max-w-[400px]">
     <h2 class="font-semibold text-center pb-2">Visualizar {{ model_name }}</h2>
     <div class="w-5/6 h-[1px] bg-[var(--gray)] m-auto" />
 
     <template v-for="(value, name) in instance.data">
-      <show-field v-if="typeof (value) != 'boolean'" class="mt-3" :label="name" :value="value ?? 'Não encontrado'" />
-      <div v-else>show bool field</div>
+      <show-field class="mt-3" :label="name" :value="value ?? 'Não encontrado'" />
     </template>
 
     <div class="flex justify-between mt-6">
-      <button-vue type="red" class="w-5/12" @click="emit('open-delete')">
+      <button-vue type="red" class="w-5/12" @click="emit('open-delete', instance)">
         Deletar
       </button-vue>
-      <button-vue class="w-5/12" @click="emit('open-edit')">
+      <button-vue class="w-5/12" @click="emit('open-edit', instance)">
         Editar
       </button-vue>
     </div>

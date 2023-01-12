@@ -70,7 +70,7 @@ class API {
     return response;
   }
 
-  public async put(path: string, data: any, aditional_headers: Object = {}, params?: Object) {
+  public async patch(path: string, data: any, aditional_headers: Object = {}, params?: Object) {
     const request = this.create_request({
       params: params,
       headers: aditional_headers,
@@ -78,7 +78,7 @@ class API {
     });
 
     // Make api call
-    const response = request.put(path, data);
+    const response = request.patch(path, data);
 
     // Return the data from the response
     return response;

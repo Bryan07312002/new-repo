@@ -159,16 +159,18 @@ function CreateMixin<TBase extends Constructor>(Base: TBase) {
 function UpdateMixin<TBase extends Constructor>(Base: TBase) {
         return class extends Base {
                 public update = async (): Promise<E.Either<HttpError, null>> => {
-                        const path = this.__proto__.path ?? null;
+                        let path = this.__proto__.path ?? null;
 
                         if (path === null) {
                                 HttpError.no_path_defined_logger();
                         }
 
+                        path = path + this.data.id + "/";
+
                         const data = this.filter_changed_data(this.data);
 
                         const response = await this.perform_update(path, data ?? {});
-                        if (response.status === 201) {
+                        if (response.status === 200) {
                                 this.data = response.data;
                                 return E.right(null);
                         }
@@ -179,7 +181,7 @@ function UpdateMixin<TBase extends Constructor>(Base: TBase) {
 
                 public perform_update = async (path: string, data: Object): Promise<AxiosResponse> => {
                         const api = new API();
-                        return await api.put(path, data);
+                        return await api.patch(path, data);
                 }
 
                 // Return object of fileds that where changed since 
@@ -234,4 +236,12 @@ function DeleteMixin<TBase extends Constructor>(Base: TBase) {
 const RetrievePaginateMixin = PaginateMixin(RetrieveMixin(class { }));
 const CRUD = PaginateMixin(RetrieveMixin(CreateMixin(UpdateMixin(DeleteMixin(RetrieveListMixin(class { }))))));
 
-export { RetrieveMixin, PaginateMixin, CreateMixin, UpdateMixin, RetrievePaginateMixin, CRUD };
+export {
+        RetrieveMixin,
+        PaginateMixin,
+        RetrieveListMixin,
+        CreateMixin,
+        UpdateMixin,
+        RetrievePaginateMixin,
+        CRUD
+};

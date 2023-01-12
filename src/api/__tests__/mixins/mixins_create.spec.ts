@@ -39,20 +39,21 @@ const Mock_failed = async (): Promise<AxiosResponse> => {
 
 describe("Create Mixin", () => {
   it("should create a new resource", async () => {
-    const new_resource = new test({name: "foo"});
+    const new_resource = new test({ name: "foo" });
     new_resource.perform_create = Mock_sucess;
 
     const result = await new_resource.create();
-    expect(result.right).toBe(null);
+    expect(result._tag).toBe("Right");
     expect(new_resource.data).toStrictEqual((await Mock_sucess()).data);
   });
 
   it("should return a HttpError", async () => {
-    const new_resource = new test({name: "foo"});
-    new_resource.perform_create = Mock_failed; 
+    const new_resource = new test({ name: "foo" });
+    new_resource.perform_create = Mock_failed;
 
     const result = await new_resource.create();
-    expect(result.left).toBeInstanceOf(HttpError);
-    expect(new_resource.data).toStrictEqual({name: "foo"});
+    expect(result._tag).toBe("Left");
+    if (result._tag === "Left") expect(result.left).toBeInstanceOf(HttpError);
+    expect(new_resource.data).toStrictEqual({ name: "foo" });
   })
 });
