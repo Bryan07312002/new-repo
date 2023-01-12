@@ -6,10 +6,7 @@
       </h1>
 
       <div class="flex items-center justify-end max-h-[60px] w-fit">
-        <div
-          class="flex items-center justify-center aspect-square overflow-hidden rounded-full bg-blue-100 w-1/5 min-w-[50px]">
-          <img class="w-full" src="@/assets/img/maxion-logo.png">
-        </div>
+        <drop-down-user />
       </div>
     </div>
     <div class="w-11/12 h-[1px] bg-[var(--light-gray)] m-auto mt-2" />
@@ -17,5 +14,6 @@
 </template>
 
 <script setup lang="ts">
+import DropDownUser from "./DropDownUser.vue";
 
 </script>
