@@ -36,9 +36,8 @@ class API {
     return axios.create({
       baseURL: this.baseURL(),
       validateStatus: undefined,
-      method: config.method ?? Method.GET,
       data: config.data,
-      headers: { Authorization: `Bearer ${this.jwt()}`, ...config.headers } as AxiosRequestHeaders,
+      headers: { Authorization: `Bearer ${this.jwt()}`, ...config.headers },
       params: config.params,
     })
   }

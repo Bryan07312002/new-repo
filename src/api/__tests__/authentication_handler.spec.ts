@@ -149,9 +149,9 @@ describe("AuthenticatorHandler", () => {
     storage.setItem("access", not_expired_jwt);
     storage.setItem("refresh", not_expired_jwt);
     storage.setItem("teste", not_expired_jwt);
-    const spy = vi.spyOn(authentication_handler, "send_logout");
+    const spy = vi.spyOn(authentication_handler, "purge_auth");
 
-    authentication_handler.logout();
+    await authentication_handler.logout();
 
     const access = storage.getItem("access");
     const refresh = storage.getItem("refresh");

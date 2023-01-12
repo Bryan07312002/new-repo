@@ -122,14 +122,18 @@ class AuthenticationHandler extends API {
     return response;
   }
 
-  public async logout() {
+  public async logout(): E.Either<HttpError, null> {
     const storage = new Storage<string>();
     const refresh_token = storage.getItem(this.refresh_token_key) || "";
-    this.purge_auth();
 
     const response = await this.send_logout(refresh_token).catch(err => { return err.response });
 
-    return response;
+    if (response.status) {
+      this.purge_auth();
+      return E.right(null);
+    }
+
+    return E.left(new HttpError(response));
   }
 
   public async send_logout(token: string) {
