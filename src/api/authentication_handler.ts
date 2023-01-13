@@ -33,7 +33,6 @@ class AuthenticationHandler extends API {
   public async login(form: login_form): Promise<E.Either<HttpError, null>> {
     const response = await this.send_login(form)
 
-
     // Check login status
     if (response?.status === 200) {
       // Store tokens at local storage
@@ -122,7 +121,7 @@ class AuthenticationHandler extends API {
     return response;
   }
 
-  public async logout(): E.Either<HttpError, null> {
+  public async logout(): Promise<E.Either<HttpError, null>> {
     const storage = new Storage<string>();
     const refresh_token = storage.getItem(this.refresh_token_key) || "";
 
