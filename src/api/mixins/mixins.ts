@@ -146,7 +146,7 @@ function CreateMixin<TBase extends Constructor>(Base: TBase) {
                         return E.left(new HttpError(response));
                 };
 
-                public perform_create = async function(
+                public perform_create = async function (
                         path: string,
                         data: Object
                 ): Promise<AxiosResponse> {
@@ -159,16 +159,25 @@ function CreateMixin<TBase extends Constructor>(Base: TBase) {
 function UpdateMixin<TBase extends Constructor>(Base: TBase) {
         return class extends Base {
                 public update = async (): Promise<E.Either<HttpError, null>> => {
-                        const path = this.__proto__.path ?? null;
+                        let path = this.__proto__.path ?? null;
 
                         if (path === null) {
                                 HttpError.no_path_defined_logger();
                         }
 
-                        const data = this.filter_changed_data(this.data);
+                        // Build path
+                        path = `${path}${this.data.id}/`;
 
-                        const response = await this.perform_update(path, data ?? {});
-                        if (response.status === 201) {
+                        const { data, partial_update } = this.filter_changed_data(this.data);
+
+                        let response;
+                        if (partial_update) {
+                                response = await this.perform_partial_update(path, data ?? {});
+                        } else {
+                                response = await this.perform_update(path, data ?? {});
+                        }
+                        
+                        if (response.status >= 200 && response.status < 300) {
                                 this.data = response.data;
                                 return E.right(null);
                         }
@@ -182,21 +191,59 @@ function UpdateMixin<TBase extends Constructor>(Base: TBase) {
                         return await api.put(path, data);
                 }
 
+                public perform_partial_update = async (path: string, data: Object): Promise<AxiosResponse> => {
+                        const api = new API();
+                        return await api.patch(path, data);
+                }
+
                 // Return object of fileds that where changed since 
                 // the object was instantiated
-                public filter_changed_data = (data: Object): Object => {
+                public filter_changed_data = (data: Object): {data: any, partial_update: boolean } => {
                         const fields = Object.keys(data);
-                        const old_fields = this.old_data;
-                        const changed_fields: Object = {};
+                        const changes_object: any = {};
+                        let partial_update = false;
 
                         // filter fileds that changed since object was instantiated
-                        fields.forEach(field => {
-                                if (data[field] !== this.old_data[field]) {
-                                        changed_fields[field] = data[field];
+                        fields.forEach(key => {
+                                const currentProperty = data[key]
+                                const oldProperty = this.old_data[key]
+                                if (typeof currentProperty === 'object' && typeof oldProperty === 'object') {
+                                        if (this.compareObjects(currentProperty, oldProperty)) {
+                                                changes_object[key] = currentProperty;
+                                        }
+                                } else {
+                                        if (currentProperty != oldProperty) {
+                                                changes_object[key] = currentProperty
+                                        }
                                 }
                         })
 
-                        return changed_fields;
+                        if (Object.keys(changes_object).length != fields.length) {
+                                partial_update = true;
+                        }
+                        return {
+                                data: changes_object, 
+                                partial_update
+                        };
+                }
+
+                private compareObjects(objectOne: any, objectTwo: any) {
+                        let isDifferent = false;
+                        const keys = Object.keys(objectOne)
+                        keys.forEach((key) => {
+                                const currentParam = objectOne[key]
+                                const oldParam = objectTwo[key]
+                                if (typeof currentParam === 'object' && typeof oldParam === 'object') {
+                                        if (this.compareObjects(currentParam, oldParam)) {
+                                                isDifferent = true;
+                                        }
+                                } else {
+                                        if (currentParam != oldParam) {
+                                                isDifferent = true;
+                                        }
+                                }
+                        })
+                        return isDifferent
                 }
         }
 }

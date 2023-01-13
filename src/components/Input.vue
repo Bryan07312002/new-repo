@@ -3,7 +3,7 @@
         <label class="text-gray-600 font-semibold" v-if="label">
             {{ label }}:
         </label>
-        <input class="border-[1px] h-[32px] pl-2 text-gray-900 border-gray-400 rounded-lg" :type="type" :value="value"
+        <input class="border-[1px] h-[32px] pl-2 text-gray-900 border-gray-400 rounded-lg w-full" :type="type" :value="value"
             @input="emit('input', $event.target?.value)" />
     </div>
 </template>

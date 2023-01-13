@@ -84,6 +84,20 @@ class API {
     return response;
   }
 
+  public async patch(path: string, data: any, aditional_headers: Object = {}, params?: Object) {
+    const request = this.create_request({
+      params: params,
+      headers: aditional_headers,
+      data: data
+    });
+
+    // Make api call
+    const response = request.patch(path, data);
+
+    // Return the data from the response
+    return response;
+  }
+
   public async delete(path: string, aditional_headers: Object = {}, params?: Object) {
     const request = this.create_request({
       params: params,

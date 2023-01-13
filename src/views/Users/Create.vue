@@ -1,12 +1,12 @@
 <template>
-  <div class="bg-white p-6 rounded-md">
+  <div class="bg-white p-6 rounded-md w-96">
     <h2 class="font-semibold text-center pb-2">Criar Usuário</h2>
     <div class="w-5/6 h-[1px] bg-[var(--gray)] m-auto" />
     <error-message :messages="error" />
     <input-vue :value="user.data.full_name" @input="user.data.full_name = $event" label="Nome de completo"
       class="mt-3" />
     <input-vue :value="user.data.username" @input="user.data.username = $event" label="Nome de usuário" class="mt-3" />
-    <input-vue :value="user.data.password" @input="user.data.password = $event" label="Senha" class="mt-3" />
+    <input-vue :value="user.data.password" :type="'password'" @input="user.data.password = $event" label="Senha" class="mt-3" />
 
     <div class="w-full flex justify-between mt-5">
       <button-vue type="red" class="w-5/12" @click="emit('cancel')">
@@ -40,5 +40,7 @@ const handle_create = async () => {
   }
 
   error.value = response.left.message;
+  console.log(response.left.message) 
+
 }
 </script>

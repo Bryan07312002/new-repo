@@ -2,6 +2,7 @@
   <div class="p-6">
     <h2 class="font-semibold text-center pb-2">Deletar Usuário</h2>
     <div class="w-5/6 h-[1px] bg-[var(--gray)] m-auto" />
+    <error-message :messages="error" />
     <p class="p-4">Deseja mesmo excluir usuário <b>{{ resource.data.username }}</b>?</p>
     <div class="flex justify-between mt-3">
       <button-vue type="red" class="w-5/12" @click="emit('cancel')">
@@ -17,6 +18,10 @@
 <script setup lang="ts">
 import User from "@/api/models/user";
 import ButtonVue from "@/components/Button.vue";
+import ErrorMessage from '@/components/ErrorMessage.vue';
+
+import { ref } from "vue";
+
 
 const props = defineProps({
   resource: {
@@ -25,10 +30,18 @@ const props = defineProps({
   }
 });
 
+const error = ref({});
+
 const emit = defineEmits(["cancel", "deleted"]);
 
 const handle_delete = async () => {
   const response = await props.resource.delete();
-  console.log(response);
+
+  if (response.right !== undefined) {
+    error.value = {};
+    return emit('deleted')
+  }
+  error.value = response.left.message;
+  console.log(response.left.message)
 }
 </script>

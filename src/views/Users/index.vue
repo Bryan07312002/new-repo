@@ -7,9 +7,13 @@
 
     <modal @close-modal="state.modal.is_open = false" :is_open="state.modal.is_open">
       <create v-if="state.modal.state == 'create'" @cancel="state.modal.is_open = false" @created="handle_create()" />
-      <show v-if="state.modal.state == 'show'" :resource="picked" @open-delete="handle_open_delete()" />
+      <show v-if="state.modal.state == 'show'" :resource="picked" @open-delete="handle_open_delete()" @open-edit="handle_open_edit()" />
       <delete v-if="state.modal.state == 'delete'" :resource="picked" @deleted="handle_deleted()"
         @cancel="state.modal.is_open" />
+      <edit v-if="state.modal.state == 'edit'" :resource="picked" @saved="handle_edited()" @update-image-file="handle_open_update_file()"
+        @update-password="handle_open_update_password()" />
+      <update-image-file v-if="state.modal.state == 'updateImage'" :resource="picked" @updated="handle_updated_image_file"/>
+      <update-password v-if="state.modal.state == 'updatePassword'" :resource="picked" @updated="handle_updated_password()"/>
     </modal>
   </default-layout>
 </template>
@@ -22,6 +26,9 @@ import User from "@/api/models/user";
 import Create from "./Create.vue";
 import Show from "./Show.vue";
 import Delete from "./Delete.vue";
+import Edit from "./Edit.vue";
+import UpdateImageFile from "./UpdateImageFile.vue";
+import UpdatePassword from "./UpdatePassword.vue";
 import { ref } from "vue";
 
 enum ModalStates {
@@ -30,6 +37,8 @@ enum ModalStates {
   Show = "show",
   Edit = "edit",
   Delete = "delete",
+  UpdateImageFile = "updateImage",
+  UpdatePassword = "updatePassword"
 }
 
 const is_paginated_loading = ref(false);
@@ -71,17 +80,51 @@ const handle_open_delete = () => {
   state.value.modal.state = ModalStates.Delete;
 }
 
+const handle_open_edit = () => {
+  state.value.modal.is_open = true;
+  state.value.modal.state = ModalStates.Edit;
+}
+
+const handle_open_update_file = () => {
+    state.value.modal.is_open = true;
+    state.value.modal.state = ModalStates.UpdateImageFile;
+}
+
+const handle_open_update_password = () => {
+    state.value.modal.is_open = true;
+    state.value.modal.state = ModalStates.UpdatePassword;
+}
+
 // actions
 const handle_create = () => {
-  // refresh paginated
   get_paginated_users();
-  state.value.modal.is_open = false;
-  state.value.modal.state = ModalStates.None;
+  closeModal()
 }
 
 const handle_deleted = () => {
-  // refresh paginated
   get_paginated_users();
+  closeModal()
+}
+
+const handle_edited = () => {
+  get_paginated_users();
+  closeModal()
+}
+
+const handle_updated_image_file = (updated_picked: User) => {
+  get_paginated_users();
+  picked.value = updated_picked;
+  state.value.modal.is_open = true;
+  state.value.modal.state = ModalStates.Edit;
+}
+
+const handle_updated_password = () => {
+  get_paginated_users();
+  state.value.modal.is_open = true;
+  state.value.modal.state = ModalStates.Edit;
+}
+
+const closeModal = () => {
   state.value.modal.is_open = false;
   state.value.modal.state = ModalStates.None;
 }
